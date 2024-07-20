@@ -1,0 +1,5 @@
+fastapi
+aiogram
+aiohttp-socks
+python-multipart
+uvicorn[standard]
