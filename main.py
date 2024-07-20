@@ -14,7 +14,7 @@ from aiogram.enums.parse_mode import ParseMode
 from aiogram.types import MenuButtonWebApp, WebAppInfo, Update
 from aiogram.client.session.aiohttp import AiohttpSession
 
-from contextlib import asynccontextmanager
+PYTHONANYWHERE = False
 
 TOKEN = getenv('BOT_TOKEN')
 
@@ -29,17 +29,10 @@ async def on_startup(bot: Bot, base_url: str):
     )
 
 
-@asynccontextmanager
-async def lifespan(app: FastAPI):
-    await bot.set_webhook(url=f"{APP_BASE_URL}/webhook",  # {base_url}/webhook
-                          allowed_updates=dispatcher.resolve_used_update_types(),
-                          drop_pending_updates=True)
-    yield
-    await bot.delete_webhook()
-
-
 logging.basicConfig(level=logging.INFO, stream=sys.stdout)
-session = AiohttpSession(proxy='http://proxy.server:3128')
+session = AiohttpSession(
+    proxy='http://proxy.server:3128'
+) if PYTHONANYWHERE else None
 bot = Bot(token=TOKEN,
           default=DefaultBotProperties(parse_mode=ParseMode.HTML),
           session=session)
@@ -47,7 +40,7 @@ dispatcher = Dispatcher()
 dispatcher["base_url"] = APP_BASE_URL
 dispatcher.startup.register(on_startup)
 dispatcher.include_router(my_router)
-app = FastAPI(lifespan=lifespan)
+app = FastAPI()
 app.state.bot = bot
 app.include_router(router)
 

@@ -29,7 +29,7 @@ async def demo_handler():
 async def check_data_handler(
         auth: Annotated[str, Form(alias="_auth")],
         request: Request):
-    bot: Bot = request.app.bot
+    bot: Bot = request.app.state.bot
 
     if check_webapp_signature(bot.token, auth):
         return {"ok": True}
@@ -41,7 +41,7 @@ async def check_data_handler(
 async def send_message_handler(auth: Annotated[str, Form(alias="_auth")],
                                with_webview: Annotated[str, Form()],
                                request: Request):
-    bot: Bot = request.app.bot
+    bot: Bot = request.app.state.bot
     try:
         web_app_init_data = safe_parse_webapp_init_data(token=bot.token,
                                                         init_data=auth)
